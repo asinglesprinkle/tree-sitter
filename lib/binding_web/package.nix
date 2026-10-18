@@ -2,16 +2,19 @@
   wasm-test-grammars,
   lib,
   buildNpmPackage,
+  importNpmLock,
   rustPlatform,
   cargo,
   pkg-config,
   emscripten,
   src,
   version,
-  npmDepsHash,
 }:
 buildNpmPackage {
-  inherit src version npmDepsHash;
+  inherit src version;
+
+  npmDeps = importNpmLock { npmRoot = ./.; };
+  inherit (importNpmLock) npmConfigHook;
 
   pname = "web-tree-sitter";
 

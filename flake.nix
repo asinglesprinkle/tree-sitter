@@ -35,8 +35,6 @@
       };
       fixturesJson = lib.importJSON ./test/fixtures/fixtures.json;
 
-      npmDepsHash = "sha256-XeGrKPpel5XKUA63UjvteqyI5srifq3g54GjhvDEjlo=";
-
       # `tree-sitter build --wasm` searches TREE_SITTER_WASI_SDK_PATH for `clang`,
       # `wasm32-unknown-wasi-clang` or `wasm32-wasi-clang`. The nixpkgs wasi32
       # toolchain only ships the `wasm32-unknown-wasip1-` prefix, so alias one.
@@ -156,7 +154,7 @@
           };
 
           web-tree-sitter = pkgs.callPackage ./lib/binding_web/package.nix {
-            inherit src version npmDepsHash;
+            inherit src version;
             inherit (self.packages.${system}) wasm-test-grammars;
           };
 
@@ -316,9 +314,12 @@
           };
 
           web-lint = pkgs.buildNpmPackage {
-            inherit src version npmDepsHash;
+            inherit src version;
 
             pname = "web-tree-sitter-lint";
+
+            npmDeps = pkgs.importNpmLock { npmRoot = ./lib/binding_web; };
+            inherit (pkgs.importNpmLock) npmConfigHook;
 
             postPatch = ''
               cp lib/binding_web/package{,-lock}.json .
